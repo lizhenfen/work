@@ -7,7 +7,15 @@ import tornado.ioloop
 import tornado.options
 from tornado.options import define, options, parse_command_line
 import tornado.template as template
+import torndb 
+
+
 define('port', default=8888, help='run on the given port', type=int)
+define('mysql_host', default="127.0.0.1:3306", help='mysql host')
+
+define('mysql_database', default="jobs", help='job db')
+define('mysql_user', default="job", help='run on the given port')
+define('mysql_passwd', default="job", help='run on the given port')
 
 #加载模板文件
 loader = template.Loader('./templates')
@@ -42,6 +50,7 @@ class NginxMainHandler(tornado.web.RequestHandler):
         3. 文件测试
         5. 服务重启
     '''
+    db = self.application.db
     def get(self):
         self.render('index.html')
     def post(self):
@@ -49,7 +58,7 @@ class NginxMainHandler(tornado.web.RequestHandler):
         nginx_user = self.get_argument('nginx_user') or 'nginx'
         worker_connections = self.get_argument('worker_connections') or 10240
         worker_rlimit_nofile = self.get_argument('worker_rlimit_nofile') or 65535
-        server_tokens = self.get_arguments=('server_tokens') or 'off'
+        server_tokens = self.get_arguments('server_tokens') or 'off'
         network_control = self.get_argument('network_control') or 'on'
         net_push = self.get_argument('net_push') or 'on'
         keepalive_timeout = self.get_argument('keepalive_timeout') or 65
@@ -66,7 +75,10 @@ class NginxMainHandler(tornado.web.RequestHandler):
             'gzip_switch': gzip_switch,
             'gzip_min_length': gzip_min_length,
         }
-        #写文件后期使用celery
+        #数据库
+        print db.query("select * from test")
+        db.execute("insert into nginx values(%(nginx_user)s,%(worker_connections)s,%(worker_rlimit_nofile)d,%(server_tokens)s,%(network_control)s,%(net_push)s,%(keepalive_timeout)d,%(gzip_switch)s,%(gzip_min_length)d )",**nginx)
+        ##写文件后期使用celery
         filehandle('nginx.yaml', NGINX_NAME, loader, nginx)
         res = subprocess.getstatusoutput('\cp %s /tmp/' % NGINX_NAME)
         if res[0] != 0:
@@ -115,6 +127,7 @@ class NginxUpstreamHandler(tornado.web.RequestHandler):
         filehandle('upstream.yaml', NGINX_NAME, loader, upstream)
         
         self.render('upstream.yaml', **upstream)
+
         
 class Application(tornado.web.Application):
     def __init__(self):
@@ -130,7 +143,13 @@ class Application(tornado.web.Application):
             xsrf_cookies  = True,
         )
         super(Application, self).__init__(handlers, **settings)
-
+        self.db = torndb.Connection(
+            host = options.mysql_host,
+            database = options.mysql_database,
+            user = options.mysql_user,
+            password = options.mysql_passwd,
+        )
+        
 def main():
     parse_command_line()
     app = Application()

@@ -1,4 +1,4 @@
-location {{expression}} {{ uri }} {
+﻿location {{expression}} {{ uri }} {
         {% if uri_rewrite %}
         #rewrite /token/(.+)$ /vats-api-token/$1 break;
         rewrite {{ uri_src }} {{ uri_dest }} break;  
