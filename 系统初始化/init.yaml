@@ -1,25 +1,37 @@
 ---
 - hosts: all
-  gather_facts: false
+  gather_facts: True
+  vars:
+    hostname: api.vats.com.cn
+    ip: 192.168.15.100
+    
   tasks:
     - name: init sshd service
       template: src='files/sys/sshd_config' dest='/etc/sshd_config' mode=0600 owner=root group=root
-      notify:
-        restart sshd
-        
+      
     - name: init yum repo to aliyun
-      template: src='files/sys/CentOS-Base.repo' dest='/etc/yum.repos.d/CentOS-Base.repo' mode=0600 owner=root group=root
-
-    - name: init yum epel to aliyun
-      template: src='files/sys/epel-6.repo' dest='/etc/yum.repos.d/epel-6.repo' mode=0600 owner=root group=root
-
-    - name: zabbix agent
-      template: src='files/monitor/zabbix_agent.tar.gz' dest='/usr/local/' state=file
-      notify:
-        start zabbix
+      template: src={{ item.src }} dest={{ item.dest }} mode=0755 owner=root group=root
+      with_items:
+        - {"src": 'files/sys/CentOS-Base.repo', 'dest': '/etc/yum.repos.d/CentOS-Base.repo' }
+        - {"src": 'files/sys/epel-6.repo', 'dest': '/etc/yum.repos.d/epel-6.repo'}
+        - {"src": 'files/sys/inittab', 'dest': '/etc/inittab'}
+        - {"src": 'files/sys/config', 'dest': '/etc/selinux/config'}
+        - {"src": 'files/sys/network', 'dest': '/etc/sysconfig/network'}
+        - {"src": 'files/sys/ifcfg-eth0', 'dest': '/etc/sysconfig/network-scripts/ifcfg-eth0'}
         
+      when:  ansible_distribution_major_version == "6"
+      
+    - name: rm network rules
+      file: path=/etc/udev/rules.d/70-persistent-net.rules state=absent
+      
+    - name: systemc update
+      yum: name={{ item }}  state=present
+      with_items:
+        - *
+    - name: stop iptables
+      service: name=iptables state=stoped enable=no
+      
   handlers:
     - name: restart sshd
       service: name=sshd state=restarted
-    - name: start zabbix
-      action: shell tar xzvf /usr/local/zabbix_agent.tar.gz; /usr/local/zabbix_agent/zabbix_agentd -c /usr/local/zabbix_agent/conf/zabbix_agentd.conf
+

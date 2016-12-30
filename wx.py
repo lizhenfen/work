@@ -15,7 +15,7 @@ def _get_token(appid,secure):
     _start_time = 0
     _end_time = time.time()
     time_among = 7200
-    if _start_time = 0 or _end_time - _start_time >= 7200:
+    if _start_time == 0 or _end_time - _start_time >= 7200:
         url='https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}'.format(appid,secure)
         req = requests.get(url)  
         data = json.loads(req.text)
@@ -27,10 +27,10 @@ def send_msg(user,obj,msg,token=None):
     if not token:
         token = _get_token(**user_secret)
     url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={}".format(token)
-    if user:
+    if not user:
         user="@all"
     values={
-        "touser":user,
+        "touser": user,
         "toparty": "2",
         "totag": "",
         "msgtype": "text",
