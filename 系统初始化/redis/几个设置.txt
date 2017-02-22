@@ -1,6 +1,0 @@
-echo 1024 > /proc/sys/net/core/somaxconn
-                              tcp_max_syn_backlog
-
-
-echo never > /sys/kernel/mm/transparent_hugepage/enabled
-vm.overcommit_memory = 1

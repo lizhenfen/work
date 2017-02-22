@@ -1,4 +1,0 @@
-/proc/net/sockstat  #统计socket的状态
-/proc/net/arp       #显示当前系统和其他系统之间交换的ARP地址信息
-/proc/net/dev       #统计网络信息
-
