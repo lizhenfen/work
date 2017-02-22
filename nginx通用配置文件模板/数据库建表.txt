@@ -1,0 +1,10 @@
+﻿create table `nginx`(
+    user varchar(200),
+    connections varchar(200),
+    rlimits int(20),
+    token char(20),
+    ntctrl char(20),
+    ntpush char(20),
+    kptimeout int(200),
+    gzipsw char(20),
+    gziplen int(200));

@@ -1,0 +1,5 @@
+°²×°
+    yum install inotify-tools -y
+ 
+Ö´ÐÐ:
+    nohup sh nginx_error_monitor.sh &

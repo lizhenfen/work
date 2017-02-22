@@ -1,0 +1,78 @@
+系统初始化:
+    192.168.15.120 #系统模板
+
+    安装:
+        1. 最小化安装
+    1. 修改selinux, 禁用
+    2. 修改iptables, 禁用
+    3. 主机名 
+    4. 网络初始化
+    5. 更新
+    6. 更新epel文件
+    1. ssh初始化(port,useDNS,GSSA*; ssh免密登录)
+        配置文件: /etc/ssh/sshd_config
+        配置文件:
+            1. 端口统一配置8690
+            2. 监听协议, 只监听ipv4
+                AddressFamily any  #any 表示同时监听ipv4和ipv6
+                AddressFamily inet  #any 表示监听ipv4
+                AddressFamily inet6  #any 表示监听ipv6
+            3. 监听地址
+            4. 是否禁止root远程登录(否)
+                PermitRootLogin yes
+            5. 基于密码的远程认证(开启)
+                PasswordAuthentication yes
+            6. ssh远程连接时,提示当前的功能
+                Banner "this a test banner before ssh connected"  #protocl 2
+            7. 指定ssh连接上来的目录
+                ChrootDirectory /home
+            8. 客户端自动断开
+                ClinetAliveCountMax: 设置客户端发送活着的最大消息次数
+                ClinetAliveInterval: 设置客户端发送活着的消息的超时间隔, 单位秒(protocl 2)
+            9. 是否启用压缩
+                Compression：指定是否启用压缩，默认delayed(直到认证成功), 其他值： yes,no
+            10. 拒绝的顺序
+                DenyUsers - AllowUsers - DenyGroups - AllowGroups  #只能指定名,可以是多个，通过 空格分割;不能是UID
+            11. GSSAPI认证
+                GSSAPIAuthentication yes  #启用GSSAPI认证
+                GSSAPIKeyExchange  no     #指明key交换, gssapi不信任ssh keys识别客户端身份
+                GSSAPICleanupCredentials yes #退出时,是否自动清除客户端凭证
+                GSSAPIEnablek5users  #是否看 k5users文件来启用访问策略
+                GSSAPIStrictAcceptorCheck no #是否启用严格的客户端认证
+                GSSAPIStoreCredentialsOnRekey #控制客户端凭证更新
+            12  未登录成功，限制多少秒断开
+                LoginGraceTime 120   #0 表示不断开
+            13 登录日志级别, 默认INFO
+                QUIET, FATAL, ERROR, INFO, VERBOSE, DEBUG, DEBUG1, DEBUG2, and DEBUG3
+            14. 禁止xll转发
+                X11Forwarding no
+            15. 打印警告信息
+                PrintMotd yes  #指定是否打印 /etc/motd
+                PrintLastLog yes #是否打印上次登录信息
+            14. 其他
+                MaxAuthTries 6
+                MaxSessions 10  #每个网络允许打开的session
+                MaxStartups     #允许打开的最大的未认证连接
+                PasswordAuthentication yes  #是否允许密码认证
+                PermitEmptyPasswords no  #是否允许空密码登录
+                PermitRootLogin  yes  #是否允许root登录
+                RSAAuthentication  yes  #rsa认证
+                StrictModes yes  #检查权限
+                UseDNS  #是否启用dns解析
+                ShowPatchLevel no  #禁止ssh返回补丁信息
+                PermitUserEnvironment no  #禁止导入变量
+                
+    2. 网络初始化(ip地址，70-persistent)
+        /etc/udev/rules.d/70-persistent-ipoib.rules  #仅仅第一次删除
+        /etc/sysconfig/network-scripts/ifcfg-eth0    #centos 6 更新此文件
+        /etc/sysconfig/network-scripts/ifcfg-enp11s0f0  #centos 7 第一块网卡
+    3. 主机名修改
+        hostname HOSTNAME  #临时改变
+        /etc/hostname  #永久改变，centos7
+        /etc/sysconfig/network  #cenos 6
+            NETWORKING=yes
+            HOSTNAME=vats-server-01
+    4. 内核优化
+        
+    5. 系统(centos 6 , centos 7)
+        mirrors-6: wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo

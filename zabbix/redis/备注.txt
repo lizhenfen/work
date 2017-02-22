@@ -1,0 +1,12 @@
+zabbix_get 获取用户数据时，用的是zabbix用户，部分特权命令需要加入visudo
+
+网络统计:
+    visudo: zabbix ALL=(ALL) NOPASSWD:/usr/sbin/ss
+
+redis信息统计:
+    redis_cli -h redis-server -p redis-port  info
+
+
+zabbix_get检测:
+    /data/zabbix/bin/zabbix_get -s 192.168.15.52 -k custom.redis.status[ip,port,used_memory]
+    /data/zabbix/bin/zabbix_get -s 192.168.15.52 -k custom.redis.status[192.168.15.52,6379,used_memory]

@@ -1,0 +1,21 @@
+---
+- hosts: all
+  tasks:
+    - name: work_dir mkdir
+      file: path={{ work_dir }} state=directory mode=0755
+
+    - name: copy config file
+      copy: src="{{ work_dir }}" dest="{{ work_dir }}" mode=0755
+    
+    - name: stop service
+      shell: "{{ work_dir }}*.sh stop"
+      
+    - name: deploy war
+      copy: src="{{ work_dir }}{{ service_name }}.war" dest="{{ work_dir }}{{ service_name }}.war" 
+      
+    - name: rm auto unzip war directory
+      file: path={{ work_dir }}{{ service_name }} state=absent
+      
+    - name: start service 
+      shell: "{{ work_dir }}*.sh start"
+      

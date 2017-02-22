@@ -1,0 +1,91 @@
+-n: 请求总数
+-c: 并发用户数, 并发用户数不能大于请求总数
+URL: 请求的目标URL, 末尾必须在后面增加"/"
+-t: 测试的最大时间, 单位s, 默认隐藏50000
+-v: 显示信息的详细. -4: 或更大值显示头信息， 3或更大值显示响应代理  2或更大值显示警告和其他信息
+-p: 指定包含了需要post数据的文件, 格式: p1=1&p2=2  -p file.txt
+-T： post数据所需要使用的Content-type头信息
+-w: 以HTML表的格式输出结果
+-i: 执行HEAD请求,
+-C: cookie-name=value 对请求附加一个cookie； 多个值时使用","分割
+-P: proxy-auth-username:passwd  对一个中转代理使用basic认证信任
+-H: 设计header头
+注意事项:
+  ab测试判断成功与否只是判断响应2xx代码,不接收服务器的返回值, LR要完整的接受服务器返回值, 所以ab的并发数大于LR
+  ab测试的并发数与机器的CPU颗粒数有很大关系,颗粒数越大,并发数越大
+  ab适合测试HTTP协议的一个URL连接的并发
+  对于简单的测试, 如接口测试,可以使用ab快速测试
+
+并发数 = pv/pv time * 页面链接次数 * HTTP响应时间 * 因数 / web服务器数量
+pv time: pv 的统计时间, 天 = 86400s
+页面链接次数: 10
+http响应时间: <=1s
+因数: 5
+
+
+基准测试
+并发测试
+负载测试
+压力测试
+
+基于业务的监控
+监控数据可视化
+部分数据初始化
+
+测试方案:
+   测试背景，测试目的，测试范围
+   测试进入条件: 性能测试数据准备完成，功能测试结束
+   测试退出条件：各场景执行时间达到要求,出现大量错误，暂停执行
+   测试指标要求：关键功能的响应时长和用户数(平均用户，高峰用户，平均响应时长，最长响应时长，时间段
+   测试策略： (最大在线人数*10%)/n  #一般为n
+   测试时机，测试风险和测试资源
+   
+基本术语:
+   samplers: 采样器，基础单元，向服务器发送一个特定的请求，在超时前等待服务器的响应
+   logic controllers: 逻辑控制器，控制脚本的执行顺序
+   listeners: 监听器，收集测试结果，以用户指定的方式展现
+   configuration elements: 配置元件， 设置公用信息
+   assertions: 断言， 验证服务器返回的信息和用户期望的信息是否一致
+   timers：定时器，保存和时间相关的一些信息，如：思考时间
+   pre-processors: 前置处理器， 任何采样器被执行前，都要先执行前置处理器
+   post-processors: 后置处理器，任何采样器被执行后，都要执行对应的后置处理器
+   test plan: 测试计划，整个测试脚本的基础设置，如 用户变量
+   thread group: 线程组，每一个虚拟用户都使用同样的测试脚本
+   workbench: 工作台，保存暂时不使用的测试元素，保存测试计划时，工作台的内容不会被保存
+分析:
+    综合jemter日志和web服务器日志
+线程组:
+   测试计划的起点，所有的逻辑控制器和采样器必须放在线程组下，其他的可以放在测试计划下，对所有线程组生效
+   参考值:  Ramp-Up=总线程数 #
+控制器:
+   采样器和逻辑控制器
+监听器
+   收集到的信息的访问方法、
+定时器
+   默认线程发送请求之间没有间隔，建议为线程组添加定时器，设置请求之间的间隔
+   多个定时器会的时长会进行叠加
+断言:
+   判断返回的结果是否与期望的结果相符
+执行顺序:
+  配置元件 -> 前置处理器 -> 定时器 -> 采样器 -> 后置处理器 -> 断言 -> 监听器
+
+
+数据库测试；
+  JDBC Connection Configuration:
+   mysql:
+     Variable Name Bound to Pool： 唯一值,
+     Database URL: jdbc:mysql://localhost:3306/db
+     JDBC Driver class: com.mysql.jdbc.Driver
+     Username/Password
+   oracle: 增加包(jdbc\lib\ojdbc14.jar  --> /lib/
+     Database URL: jdbc:oracle:thin:@ip:port:实例名
+     JDBC Driver class: oracle.jdbc.driver.OracleDriver
+     Username/Password
+ftp测试:
+LDAP测试:
+webservice测试
+
+性能分析:
+    1. 分析性能测试期间，测试环境是否正常运行(cpm, mem, net)
+    2. 检查jemeter测试脚本参数设置是否合理，检查jmeter的运行模式是否合理(如 Ramp-Up=0/1 )
+    3. 检查测试结果是否暴露了系统瓶颈(服务响应时长, 网络时长)

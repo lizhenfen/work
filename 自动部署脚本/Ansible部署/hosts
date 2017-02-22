@@ -1,0 +1,1 @@
+192.168.15.52 ansible_ssh_port=8690 ansible_ssh_pass=vats@password

@@ -1,0 +1,5 @@
+﻿upstream {{ name }} {
+    {% for  ip in ips %}
+    server {{ ip['ip'] }} weight={{ ip['weight'] }} max_fails={{ ip['count'] }} fail_timeout={{ ip['timeout'] }}s;
+    {% end for %}
+}

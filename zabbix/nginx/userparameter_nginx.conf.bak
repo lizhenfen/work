@@ -1,0 +1,5 @@
+﻿UserParameter=nginx_active_num,sh /etc/zabbix/zabbix_agentd.d/check_nginx.sh nginx_active_num
+UserParameter=nginx_request_num,sh /etc/zabbix/zabbix_agentd.d/check_nginx.sh nginx_request_num
+UserParameter=nginx_read_num,sh /etc/zabbix/zabbix_agentd.d/check_nginx.sh nginx_read_num
+UserParameter=nginx_write_num,sh /etc/zabbix/zabbix_agentd.d/check_nginx.sh nginx_write_num
+UserParameter=nginx_wait_num,sh /etc/zabbix/zabbix_agentd.d/check_nginx.sh nginx_wait_num

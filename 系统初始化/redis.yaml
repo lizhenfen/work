@@ -1,0 +1,25 @@
+---
+- hosts: all
+  gather_facts: False
+  vars:
+    redis_path: /usr/local/redis
+    
+  tasks:
+    - name: mkdir directory
+      file: path={{ redis_path }} state=directory
+
+    - name: redis paramgram
+      copy: src={{ item }} dest={{ redis_path }} mode=0755 owner=root group=root
+      with_items:
+        - "files/redis/redis-server"
+        - "files/redis/redis-cli"
+
+    - name: redis config
+      template: src={{ item }} dest={{ redis_path }}
+      with_items:
+        - files/redis/redis.conf
+      notify:
+        - start redis
+  handlers:
+    - name: start redis
+      command: "{{ redis_path  }}/redis-server {{ redis_path }}/redis.conf"
