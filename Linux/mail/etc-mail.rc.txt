@@ -1,0 +1,5 @@
+#文件末尾追加以下文字
+
+set from=lz999@vats.com.cn smtp=mail.vats.com.cn
+set smtp-auth-user=lz999 smtp-auth-password=Vats888
+set smtp-auth=login
