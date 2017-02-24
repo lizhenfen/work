@@ -20,6 +20,7 @@ except:
 
     
 def port_discovery():
+    process_name = ['cupsd', 'rpc.statd', 'rpcbind', 'master', 'sshd']
     res = {}
     t_info = []
     status,outputs = subprocess.getstatusoutput('''sudo  ss -ltunp | awk -F' ' '{print $1,$2,$5,$7}' ''')
@@ -40,6 +41,7 @@ def port_discovery():
             app      = info[3].split(":")[-1]
             app_name = app.strip("(())").split("),(")
             app_name = set([ i.split(',')[0] for i in app_name ])
+            if app_name in process_name: continue
             t_info += [{
                 '{#PROTOCOL}':protocal, 
                 '{#STATUS}': status,
