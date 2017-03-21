@@ -23,7 +23,7 @@ def port_discovery():
     process_name = ['cupsd', 'rpc.statd', 'rpcbind', 'master', 'sshd']
     res = {}
     t_info = []
-    status,outputs = subprocess.getstatusoutput('''sudo  ss -ltunp | awk -F' ' '{print $1,$2,$5,$7}' ''')
+    status,outputs = subprocess.getstatusoutput('''ss -ltunp | awk -F' ' '{print $1,$2,$5,$7}' ''')
     outputs = outputs.split('\n')[1:]
     for info in outputs:
         try:

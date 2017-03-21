@@ -1,16 +1,31 @@
 #!/bin/bash
-
 PWDDIR=$(cd `dirname $0`;pwd)
 
 [ -f ${PWDDIR}/appclient.conf ]  && . ${PWDDIR}/appclient.conf || PORT=8080
+while true
+do
+   if [ `ss -ltnp | grep $PORT | wc -l` -gt 0 ]
+   then
+       PORT=$((PORT + 1))
+   else
+       break
+   fi
+done
+
+
+
 . /etc/init.d/functions 
 
-SERVICE_NAME=${PWDDIR##*/}
 SERVICE_IMAGE=base/tomcat-7
 DOCKER_ADDR=192.168.15.198:5000
 REMOTE_IMAGE="${DOCKER_ADDR}/${SERVICE_IMAGE}"
 IMAGENUMS=`docker images | grep "${SERVICE_IMAGE}" | wc -l`
-FULL_SERVICE=vats-api-${SERVICE_NAME}
+
+SERVICE_NAME=${PWDDIR##*/}
+
+DDIR=${PWDDIR%/*}
+F_MIDDLE_NAME=${DDIR##*/}
+FULL_SERVICE=vats-${F_MIDDLE_NAME}-${SERVICE_NAME}
 DATADIR=${PWD}
 DOCKER_LOG="${PWDDIR}/${FULL_SERVICE}.log"
 
@@ -39,13 +54,13 @@ check_logs(){
         if [ `grep "initialization completed" ${DOCKER_LOG} | wc -l` -ge 1 ]; then
             break
         fi
-        if [ $(( ${COUNT} - 100 )) -ge 0 ];then
+        if [ $(( ${COUNT} - 60 )) -eq 0 ];then
             echo "${SERVICE_NAME} start failed"
             return 1
         fi
         timestamp=`date +%s`
         COUNT=$(( COUNT + 1 ))
-        sleep 2
+        sleep 1
     done 
 }
 
@@ -108,4 +123,3 @@ case "${SV}" in
         echo "Usage: $0 [start|stop|restart]"
         ;;
 esac     
-        
